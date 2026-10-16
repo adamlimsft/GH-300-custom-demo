@@ -7,8 +7,9 @@ can browse six training topics and try a registration flow.
 
 1. Select **Code → Codespaces → Create codespace on main** (or select your demo branch).
 2. Wait for the dev container to finish starting. It runs `npm start` automatically.
-3. Open the preview for port **3000**, or select **Open in Browser** in the **Ports** tab.
-   Keep the forwarded port private.
+3. The website opens in a browser tab for port **3000**, or select **Open in Browser**
+   in the **Ports** tab. Keep the forwarded port private. Use a browser tab rather
+   than an embedded preview because the website blocks iframe embedding.
 
 If the server is not running, run `npm start` in a terminal. If port 3000 is
 already in use, use the existing server instead of starting a second instance.
