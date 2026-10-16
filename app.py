@@ -71,7 +71,28 @@ def get_topics():
     return topics
 
 
-@app.post("/api/registrations", status_code=201)
+@app.post(
+    "/api/registrations",
+    status_code=201,
+    openapi_extra={
+        "requestBody": {
+            "required": True,
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "required": ["name", "email", "topicId"],
+                        "properties": {
+                            "name": {"type": "string", "example": "Demo Learner"},
+                            "email": {"type": "string", "example": "learner@example.com"},
+                            "topicId": {"type": "string", "example": "copilot-fundamentals"},
+                        },
+                    },
+                },
+            },
+        },
+    },
+)
 async def register_for_topic(request: Request):
     """Register a fictional participant for one training topic."""
     if request.headers.get("content-type", "").split(";")[0].strip() != "application/json":

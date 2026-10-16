@@ -107,6 +107,12 @@ class TrainingAPITests(unittest.TestCase):
         schema = self.client.get("/openapi.json").json()
         self.assertIn("/api/topics", schema["paths"])
         self.assertIn("/api/registrations", schema["paths"])
+        body = schema["paths"]["/api/registrations"]["post"]["requestBody"]
+        fields = body["content"]["application/json"]["schema"]["properties"]
+        response = self.client.post("/api/registrations", json={
+            key: field["example"] for key, field in fields.items()
+        })
+        self.assertEqual(response.status_code, 201)
 
 
 if __name__ == "__main__":
