@@ -1,0 +1,13 @@
+{
+  "name": "Telstra GH-300 training",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Telstra training website",
+      "onAutoForward": "openPreview",
+      "visibility": "private"
+    }
+  },
+  "postAttachCommand": "npm start"
+}
