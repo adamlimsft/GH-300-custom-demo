@@ -77,9 +77,6 @@ function createServer() {
           });
         }
         const key = `${email}:${topic.id}`;
-        if (registrations.has(key)) {
-          return json(response, 409, { error: 'You are already registered for this topic.' });
-        }
         const registration = { id: randomUUID(), name, email, topicId: topic.id };
         registrations.set(key, registration);
         return json(response, 201, { registration, message: `You are registered for ${topic.title}.` });
