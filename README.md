@@ -23,7 +23,19 @@ instead of starting a second instance. No database or credentials are required.
 
 ### Python (recommended for demos)
 
-Use Python 3.12 or newer. From the repository directory:
+Use Python 3.12 or newer. From the repository directory, on Windows PowerShell:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe app.py
+```
+
+These commands do not require environment activation. If `python` opens the
+Microsoft Store or reports "Python was not found", use `py` as shown above.
+If `py` is also unavailable, install Python and open a new terminal.
+
+On macOS/Linux:
 
 ```sh
 python -m venv .venv
@@ -32,7 +44,6 @@ python -m pip install -r requirements.txt
 python app.py
 ```
 
-On Windows, activate the environment with `.venv\Scripts\Activate.ps1` instead.
 Open http://localhost:3000. Python edits reload the server automatically;
 refresh the browser after frontend edits. Reloading resets demo registrations.
 
