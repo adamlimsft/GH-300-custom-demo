@@ -23,7 +23,19 @@ instead of starting a second instance. No database or credentials are required.
 
 ### Python (recommended for demos)
 
-Use Python 3.12 or newer. From the repository directory:
+Use Python 3.12 or newer. From the repository directory, on Windows PowerShell:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe app.py
+```
+
+These commands do not require environment activation. If `python` opens the
+Microsoft Store or reports "Python was not found", use `py` as shown above.
+If `py` is also unavailable, install Python and open a new terminal.
+
+On macOS/Linux:
 
 ```sh
 python -m venv .venv
@@ -32,7 +44,6 @@ python -m pip install -r requirements.txt
 python app.py
 ```
 
-On Windows, activate the environment with `.venv\Scripts\Activate.ps1` instead.
 Open http://localhost:3000. Python edits reload the server automatically;
 refresh the browser after frontend edits. Reloading resets demo registrations.
 
@@ -83,11 +94,36 @@ Run the original Node.js tests with `npm test`. There is no frontend build step.
 
 ## API
 
-- `GET /api/topics`: returns the training topic catalogue.
+- `GET /api/topics`: returns the training topic catalogue with `capacity` (30)
+  and `registrationCount` for each topic. The website displays these counts on
+  load and refreshes them after a successful signup. Refresh the page to see
+  signups made in other browsers.
+  Capacity is display-only: registrations above 30 are still accepted and shown.
+  Counts include every stored registration, including repeated submissions due
+  to the intentional duplicate bug below. Counts reset when the server restarts,
+  and no participant details
+  are included in the topic response.
 - `POST /api/registrations`: accepts JSON with `name`, `email`, and `topicId`;
   returns `201` and a registration confirmation. Invalid input returns `400`,
-  duplicate email/topic pairs return `409`, oversized requests return `413`,
+  duplicate email/topic pairs should return `409` (see the exercise below),
+  oversized requests return `413`,
   and non-JSON requests return `415`.
+
+## Intentional bug exercise: duplicate registrations
+
+Both backends deliberately omit the duplicate-registration check for a Copilot
+debugging exercise. Submit the same fictional email and topic twice without
+restarting the server: both requests return `201` with different registration
+IDs. Each submission is stored separately by its registration ID, so the topic's
+displayed count increases from 0 to 1 to 2 even for the same person.
+
+The existing duplicate-prevention tests are intentionally unchanged and should
+fail with `201` instead of the expected `409`. Ask Copilot to investigate, restore
+the duplicate check by matching email and topic against existing registrations
+before storing a registration, and rerun the tests. After
+the fix, the second request should return `409`, while registering the same email
+for a different topic should still succeed. A rejected duplicate must not increase
+the displayed count.
 
 **Demo only:** use fictional details. Registrations live only in server memory
 and disappear when the process restarts. No email is sent and no real place is

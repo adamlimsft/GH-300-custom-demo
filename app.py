@@ -68,7 +68,17 @@ def frontend_styles():
 @app.get("/api/topics")
 def get_topics():
     """View the available training topics without exposing participant details."""
-    return topics
+    return [
+        {
+            **topic,
+            "capacity": 30,
+            "registrationCount": sum(
+                registration["topicId"] == topic["id"]
+                for registration in registrations.values()
+            ),
+        }
+        for topic in topics
+    ]
 
 
 @app.post(
@@ -127,11 +137,8 @@ async def register_for_topic(request: Request):
             detail="Enter a name (up to 100 characters), a valid email, and an available topic.",
         )
 
-    key = (email, topic["id"])
-    if key in registrations:
-        raise HTTPException(status_code=409, detail="You are already registered for this topic.")
     registration = {"id": str(uuid4()), "name": name, "email": email, "topicId": topic["id"]}
-    registrations[key] = registration
+    registrations[registration["id"]] = registration
     return {
         "registration": registration,
         "message": f"You are registered for {topic['title']}.",

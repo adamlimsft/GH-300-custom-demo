@@ -45,6 +45,39 @@ class TrainingAPITests(unittest.TestCase):
                 self.assertIsInstance(topic[field], str)
                 self.assertTrue(topic[field])
             self.assertNotIn("participants", topic)
+            self.assertEqual(topic["capacity"], 30)
+            self.assertEqual(topic["registrationCount"], 0)
+
+    def test_topic_registration_counts_are_display_only(self):
+        for index in range(31):
+            response = self.client.post("/api/registrations", json={
+                **self.valid, "email": f"learner{index}@example.com",
+            })
+            self.assertEqual(response.status_code, 201)
+        response = self.client.post("/api/registrations", json={
+            **self.valid, "topicId": "effective-prompts",
+        })
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.get("/api/topics")
+        self.assertEqual(response.status_code, 200)
+        for topic in response.json():
+            expected = {
+                "copilot-fundamentals": 31,
+                "effective-prompts": 1,
+            }.get(topic["id"], 0)
+            self.assertEqual(topic["registrationCount"], expected)
+            self.assertEqual(topic["capacity"], 30)
+            self.assertEqual(set(topic), {
+                "id", "title", "description", "duration", "capacity", "registrationCount",
+            })
+        self.assertNotIn("learner@example.com", response.text)
+
+        registrations.clear()
+        self.assertTrue(all(
+            topic["registrationCount"] == 0
+            for topic in self.client.get("/api/topics").json()
+        ))
 
     def test_register_normalize_and_prevent_duplicates(self):
         response = self.client.post("/api/registrations", json={
