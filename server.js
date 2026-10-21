@@ -81,9 +81,8 @@ function createServer() {
             error: 'Enter a name (up to 100 characters), a valid email, and an available topic.',
           });
         }
-        const key = `${email}:${topic.id}`;
         const registration = { id: randomUUID(), name, email, topicId: topic.id };
-        registrations.set(key, registration);
+        registrations.set(registration.id, registration);
         return json(response, 201, { registration, message: `You are registered for ${topic.title}.` });
       } catch (error) {
         return json(response, error.status || 500, {

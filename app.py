@@ -137,9 +137,8 @@ async def register_for_topic(request: Request):
             detail="Enter a name (up to 100 characters), a valid email, and an available topic.",
         )
 
-    key = (email, topic["id"])
     registration = {"id": str(uuid4()), "name": name, "email": email, "topicId": topic["id"]}
-    registrations[key] = registration
+    registrations[registration["id"]] = registration
     return {
         "registration": registration,
         "message": f"You are registered for {topic['title']}.",
