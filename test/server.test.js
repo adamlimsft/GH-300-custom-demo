@@ -38,7 +38,28 @@ test('lists unique topics with the fields needed by the frontend', async () => {
       assert.equal(typeof topic[field], 'string');
       assert.ok(topic[field].length);
     }
+    assert.equal(topic.capacity, 30);
+    assert.equal(topic.registrationCount, 0);
   }
+});
+
+test('reports per-topic registration counts without enforcing the displayed capacity', async () => {
+  const data = { name: 'Demo Learner', email: 'counts@example.com', topicId: 'testing-debugging' };
+  for (let index = 0; index < 31; index += 1) {
+    assert.equal((await register({ ...data, email: `counts${index}@example.com` })).status, 201);
+  }
+  assert.equal((await register({ ...data, topicId: 'hands-on-lab' })).status, 201);
+  const response = await fetch(`${baseUrl}/api/topics`);
+  assert.equal(response.status, 200);
+  const topics = await response.json();
+  for (const topic of topics) {
+    const expected = topic.id === 'testing-debugging' ? 31 : topic.id === 'hands-on-lab' ? 1 : 0;
+    assert.equal(topic.registrationCount, expected);
+    assert.equal(topic.capacity, 30);
+    assert.deepEqual(Object.keys(topic).sort(),
+      ['id', 'title', 'description', 'duration', 'capacity', 'registrationCount'].sort());
+  }
+  assert.ok(!JSON.stringify(topics).includes('counts@example.com'));
 });
 
 test('registers, normalizes details, and prevents duplicate email/topic pairs', async () => {

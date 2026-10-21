@@ -58,7 +58,12 @@ function createServer() {
       return json(response, 400, { error: 'Invalid request URL.' });
     }
     if (pathname === '/api/topics' && request.method === 'GET') {
-      return json(response, 200, topics);
+      return json(response, 200, topics.map((topic) => ({
+        ...topic,
+        capacity: 30,
+        registrationCount: Array.from(registrations.values())
+          .filter((registration) => registration.topicId === topic.id).length,
+      })));
     }
 
     if (pathname === '/api/registrations' && request.method === 'POST') {

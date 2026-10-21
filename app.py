@@ -68,7 +68,17 @@ def frontend_styles():
 @app.get("/api/topics")
 def get_topics():
     """View the available training topics without exposing participant details."""
-    return topics
+    return [
+        {
+            **topic,
+            "capacity": 30,
+            "registrationCount": sum(
+                registration["topicId"] == topic["id"]
+                for registration in registrations.values()
+            ),
+        }
+        for topic in topics
+    ]
 
 
 @app.post(

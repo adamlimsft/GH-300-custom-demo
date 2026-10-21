@@ -94,7 +94,15 @@ Run the original Node.js tests with `npm test`. There is no frontend build step.
 
 ## API
 
-- `GET /api/topics`: returns the training topic catalogue.
+- `GET /api/topics`: returns the training topic catalogue with `capacity` (30)
+  and `registrationCount` for each topic. The website displays these counts on
+  load and refreshes them after a successful signup. Refresh the page to see
+  signups made in other browsers.
+  Capacity is display-only: registrations above 30 are still accepted and shown.
+  Counts include stored email/topic pairs, not repeated submissions; the
+  intentional duplicate bug below overwrites the existing pair without increasing
+  its count. Counts reset when the server restarts, and no participant details
+  are included in the topic response.
 - `POST /api/registrations`: accepts JSON with `name`, `email`, and `topicId`;
   returns `201` and a registration confirmation. Invalid input returns `400`,
   duplicate email/topic pairs should return `409` (see the exercise below),
