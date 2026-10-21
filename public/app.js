@@ -4,6 +4,8 @@ const submitButton = document.querySelector('#submit');
 const status = document.querySelector('#status');
 
 async function loadTopics() {
+  topicsContainer.setAttribute('aria-busy', 'true');
+  submitButton.disabled = true;
   try {
     const response = await fetch('/api/topics');
     if (!response.ok) throw new Error('Unable to load topics.');
@@ -23,7 +25,10 @@ async function loadTopics() {
       description.textContent = topic.description;
       const duration = document.createElement('small');
       duration.textContent = topic.duration;
-      card.append(radio, title, description, duration);
+      const registrations = document.createElement('span');
+      registrations.className = 'registration-count';
+      registrations.textContent = `${topic.registrationCount} of ${topic.capacity} registered (maximum ${topic.capacity} people)`;
+      card.append(radio, title, description, duration, registrations);
       topicsContainer.append(card);
     }
     if (!topics.length) throw new Error('No topics are currently available.');
@@ -51,11 +56,12 @@ form.addEventListener('submit', async (event) => {
     status.textContent = result.message;
     status.className = 'success';
     form.reset();
+    await loadTopics();
   } catch (error) {
     status.textContent = error.message || 'Unable to register. Please try again.';
     status.className = 'error';
   } finally {
-    submitButton.disabled = false;
+    submitButton.disabled = !topicsContainer.querySelector('input[name="topicId"]');
   }
 });
 

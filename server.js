@@ -58,7 +58,12 @@ function createServer() {
       return json(response, 400, { error: 'Invalid request URL.' });
     }
     if (pathname === '/api/topics' && request.method === 'GET') {
-      return json(response, 200, topics);
+      return json(response, 200, topics.map((topic) => ({
+        ...topic,
+        capacity: 30,
+        registrationCount: Array.from(registrations.values())
+          .filter((registration) => registration.topicId === topic.id).length,
+      })));
     }
 
     if (pathname === '/api/registrations' && request.method === 'POST') {
@@ -76,12 +81,8 @@ function createServer() {
             error: 'Enter a name (up to 100 characters), a valid email, and an available topic.',
           });
         }
-        const key = `${email}:${topic.id}`;
-        if (registrations.has(key)) {
-          return json(response, 409, { error: 'You are already registered for this topic.' });
-        }
         const registration = { id: randomUUID(), name, email, topicId: topic.id };
-        registrations.set(key, registration);
+        registrations.set(registration.id, registration);
         return json(response, 201, { registration, message: `You are registered for ${topic.title}.` });
       } catch (error) {
         return json(response, error.status || 500, {
