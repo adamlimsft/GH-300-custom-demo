@@ -128,8 +128,6 @@ async def register_for_topic(request: Request):
         )
 
     key = (email, topic["id"])
-    if key in registrations:
-        raise HTTPException(status_code=409, detail="You are already registered for this topic.")
     registration = {"id": str(uuid4()), "name": name, "email": email, "topicId": topic["id"]}
     registrations[key] = registration
     return {
